@@ -59,32 +59,32 @@ export interface Registration {
 }
 
 export const fetchRegistrations = async (): Promise<Registration[]> => {
-  const res = await api.get('/api/registrations');
+  const res = await api.get('/api/v1/admin/users');
   return res.data;
 };
 
 export const markAttendance = async (studentNumber: string, day: 1 | 2) => {
-  const res = await api.post('/api/attendance', { studentNumber, day });
+  const res = await api.post('/api/v1/admin/attendance', { studentNumber, day });
   return res.data;
 };
 
 export const fetchStats = async () => {
-  const res = await api.get('/api/stats');
+  const res = await api.get('/api/v1/admin/stats');
   return res.data;
 };
 
 export const fetchBlockedIPs = async () => {
-  const res = await api.get('/api/blocked-ips');
+  const res = await api.get('/api/v1/admin/blocked-ips');
   return res.data;
 };
 
 export const blockIP = async (ip: string, reason: string) => {
-  const res = await api.post('/api/blocked-ips', { ip, reason });
+  const res = await api.post('/api/v1/admin/blocked-ips', { ip, reason });
   return res.data;
 };
 
 export const unblockIP = async (ipId: string) => {
-  const res = await api.delete(`/api/blocked-ips/${ipId}`);
+  const res = await api.delete(`/api/v1/admin/blocked-ips/${ipId}`);
   return res.data;
 };
 
