@@ -36,7 +36,7 @@ export const clearApiKey = () => {
 };
 
 export const validateApiKey = async (key: string) => {
-  const res = await axios.get(`${BASE_URL}/api/registrations`, {
+  const res = await axios.get(`${BASE_URL}/api/v1/admin/users`, {
     headers: { 'x-api-key': key },
   });
   return res.status === 200;
