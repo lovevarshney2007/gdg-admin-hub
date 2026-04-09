@@ -60,11 +60,11 @@ export interface Registration {
 
 export const fetchRegistrations = async (): Promise<Registration[]> => {
   const res = await api.get('/api/v1/admin/users');
-  return res.data;
+  return res.data.data;
 };
 
 export const markAttendance = async (studentNumber: string, day: 1 | 2) => {
-  const res = await api.post('/api/v1/admin/attendance', { studentNumber, day });
+  const res = await api.post('/api/v1/admin/mark-attendance', { qrData: studentNumber, day });
   return res.data;
 };
 
@@ -79,12 +79,12 @@ export const fetchBlockedIPs = async () => {
 };
 
 export const blockIP = async (ip: string, reason: string) => {
-  const res = await api.post('/api/v1/admin/blocked-ips', { ip, reason });
+  const res = await api.post('/api/v1/admin/block-ip', { ipAddress: ip, reason });
   return res.data;
 };
 
-export const unblockIP = async (ipId: string) => {
-  const res = await api.delete(`/api/v1/admin/blocked-ips/${ipId}`);
+export const unblockIP = async (ip: string) => {
+  const res = await api.post('/api/v1/admin/unblock-ip', { ipAddress: ip });
   return res.data;
 };
 

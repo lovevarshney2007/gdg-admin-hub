@@ -35,8 +35,9 @@ const UsersPage = () => {
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Student Number', 'College', 'Year', 'Department', 'Day 1', 'Day 2'];
-    const rows = filtered.map((r) => [
+    const headers = ['S.No', 'Name', 'Email', 'Phone', 'Student Number', 'College', 'Year', 'Department', 'Day 1', 'Day 2'];
+    const rows = filtered.map((r, index) => [
+      index + 1,
       r.name, r.email, r.phone, r.studentNumber, r.college, r.year, r.department,
       r.day1Present ? 'Present' : 'Absent',
       r.day2Present ? 'Present' : 'Absent',
@@ -79,6 +80,7 @@ const UsersPage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">#</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Student #</TableHead>
@@ -91,13 +93,16 @@ const UsersPage = () => {
               <TableBody>
                 {paginated.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                       No registrations found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginated.map((r) => (
+                  paginated.map((r, index) => (
                     <TableRow key={r.id}>
+                      <TableCell className="text-muted-foreground text-xs">
+                        {page * PAGE_SIZE + index + 1}
+                      </TableCell>
                       <TableCell className="font-medium">{r.name}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{r.email}</TableCell>
                       <TableCell className="font-mono text-sm">{r.studentNumber}</TableCell>

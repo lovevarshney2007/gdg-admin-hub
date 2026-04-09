@@ -97,6 +97,7 @@ const IPManagementPage = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">#</TableHead>
                 <TableHead>IP Address</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Blocked At</TableHead>
@@ -106,20 +107,21 @@ const IPManagementPage = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : ips.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No blocked IPs
                   </TableCell>
                 </TableRow>
               ) : (
-                ips.map((ip: any) => (
-                  <TableRow key={ip.id || ip.ip}>
-                    <TableCell className="font-mono">{ip.ip}</TableCell>
+                ips.map((ip: any, index: number) => (
+                  <TableRow key={ip._id || ip.ipAddress}>
+                    <TableCell className="text-muted-foreground text-xs">{index + 1}</TableCell>
+                    <TableCell className="font-mono">{ip.ipAddress}</TableCell>
                     <TableCell className="text-muted-foreground">{ip.reason || '—'}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {ip.blockedAt ? new Date(ip.blockedAt).toLocaleDateString() : '—'}
@@ -128,7 +130,7 @@ const IPManagementPage = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => unblockMutation.mutate(ip.id)}
+                        onClick={() => unblockMutation.mutate(ip.ipAddress)}
                         disabled={unblockMutation.isPending}
                         className="text-destructive hover:text-destructive"
                       >
