@@ -1,19 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRegistrations, type Registration } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Download, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const PAGE_SIZE = 15;
+const CHECKS_STORAGE_KEY = 'gdg_admin_user_checks';
 
 const UsersPage = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  
+  // Local state for checkboxes, initialized from localStorage
+  const [checkedMap, setCheckedMap] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem(CHECKS_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const { data: registrations, isLoading } = useQuery({
     queryKey: ['registrations'],
@@ -34,10 +46,17 @@ const UsersPage = () => {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
+  const toggleCheck = (id: string) => {
+    const newMap = { ...checkedMap, [id]: !checkedMap[id] };
+    setCheckedMap(newMap);
+    localStorage.setItem(CHECKS_STORAGE_KEY, JSON.stringify(newMap));
+  };
+
   const exportCSV = () => {
-    const headers = ['S.No', 'Name', 'Email', 'Phone', 'Student Number', 'College', 'Year', 'Department', 'Day 1', 'Day 2'];
+    const headers = ['S.No', 'Verified', 'Name', 'Email', 'Phone', 'Student Number', 'College', 'Year', 'Department', 'Day 1', 'Day 2'];
     const rows = filtered.map((r, index) => [
       index + 1,
+      checkedMap[r.studentNumber] ? 'YES' : 'NO',
       r.name, r.email, r.phone, r.studentNumber, r.college, r.year, r.department,
       r.day1Present ? 'Present' : 'Absent',
       r.day2Present ? 'Present' : 'Absent',
@@ -68,10 +87,12 @@ const UsersPage = () => {
             className="pl-9"
           />
         </div>
-        <Button variant="outline" onClick={exportCSV} className="gap-2">
-          <Download className="w-4 h-4" />
-          Export CSV
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={exportCSV} className="gap-2 flex-1 sm:flex-none">
+            <Download className="w-4 h-4" />
+            Export CSV
+          </Button>
+        </div>
       </div>
 
       <Card className="glass-card overflow-hidden">
@@ -81,6 +102,9 @@ const UsersPage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
+                  <TableHead className="w-12 px-2 text-center">
+                    <CheckCircle2 className="w-4 h-4 mx-auto text-muted-foreground" />
+                  </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Student #</TableHead>
@@ -93,15 +117,22 @@ const UsersPage = () => {
               <TableBody>
                 {paginated.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                       No registrations found
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginated.map((r, index) => (
-                    <TableRow key={r.id}>
+                    <TableRow key={r._id || r.id || r.studentNumber}>
                       <TableCell className="text-muted-foreground text-xs">
                         {page * PAGE_SIZE + index + 1}
+                      </TableCell>
+                      <TableCell className="text-center px-2">
+                        <Checkbox 
+                          checked={!!checkedMap[r.studentNumber]}
+                          onCheckedChange={() => toggleCheck(r.studentNumber)}
+                          className="data-[state=checked]:bg-success data-[state=checked]:border-success transition-colors"
+                        />
                       </TableCell>
                       <TableCell className="font-medium">{r.name}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{r.email}</TableCell>
