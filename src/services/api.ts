@@ -51,8 +51,8 @@ export interface Registration {
   college: string;
   year: string;
   department: string;
-  day1Present: boolean;
-  day2Present: boolean;
+  isPresentDay1: boolean;
+  isPresentDay2: boolean;
   registeredAt: string;
   qrCode?: string;
   [key: string]: unknown;
@@ -75,7 +75,7 @@ export const fetchStats = async () => {
 
 export const fetchBlockedIPs = async () => {
   const res = await api.get('/api/v1/admin/blocked-ips');
-  return res.data;
+  return res.data.data;
 };
 
 export const blockIP = async (ip: string, reason: string) => {

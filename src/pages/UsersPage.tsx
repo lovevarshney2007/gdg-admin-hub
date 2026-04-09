@@ -58,8 +58,8 @@ const UsersPage = () => {
       index + 1,
       checkedMap[r.studentNumber] ? 'YES' : 'NO',
       r.name, r.email, r.phone, r.studentNumber, r.college, r.year, r.department,
-      r.day1Present ? 'Present' : 'Absent',
-      r.day2Present ? 'Present' : 'Absent',
+      r.isPresentDay1 ? 'Present' : 'Absent',
+      r.isPresentDay2 ? 'Present' : 'Absent',
     ]);
     const csv = [headers, ...rows].map((row) => row.map((v) => `"${v ?? ''}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -140,10 +140,10 @@ const UsersPage = () => {
                       <TableCell>{r.department}</TableCell>
                       <TableCell>{r.year}</TableCell>
                       <TableCell className="text-center">
-                        <AttendanceBadge present={r.day1Present} />
+                        <AttendanceBadge present={r.isPresentDay1} />
                       </TableCell>
                       <TableCell className="text-center">
-                        <AttendanceBadge present={r.day2Present} />
+                        <AttendanceBadge present={r.isPresentDay2} />
                       </TableCell>
                     </TableRow>
                   ))

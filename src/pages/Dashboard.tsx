@@ -33,8 +33,8 @@ const Dashboard = () => {
 
   const regs = registrations ?? [];
   const totalRegistrations = regs.length;
-  const day1Present = regs.filter((r) => r.day1Present).length;
-  const day2Present = regs.filter((r) => r.day2Present).length;
+  const day1Present = regs.filter((r) => r.isPresentDay1).length;
+  const day2Present = regs.filter((r) => r.isPresentDay2).length;
   const attendanceRate = totalRegistrations > 0 ? Math.round(((day1Present + day2Present) / (totalRegistrations * 2)) * 100) : 0;
 
   const stats = [
