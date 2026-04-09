@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { NavLink } from '@/components/NavLink';
-import { LayoutDashboard, Users, ScanLine, ShieldBan, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, ScanLine, ShieldBan, LogOut, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
@@ -22,6 +22,7 @@ const navItems = [
   { title: 'Registrations', url: '/dashboard/users', icon: Users },
   { title: 'QR Scanner', url: '/dashboard/scanner', icon: ScanLine },
   { title: 'IP Management', url: '/dashboard/ip', icon: ShieldBan },
+  { title: 'Suspicious Activity', url: '/dashboard/suspicious', icon: AlertTriangle },
 ];
 
 function AppSidebar() {

@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/UsersPage";
 import ScannerPage from "./pages/ScannerPage";
 import IPManagementPage from "./pages/IPManagementPage";
+import SuspiciousActivityPage from "./pages/SuspiciousActivityPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/dashboard/users" element={<ProtectedRoute><DashboardLayout><UsersPage /></DashboardLayout></ProtectedRoute>} />
             <Route path="/dashboard/scanner" element={<ProtectedRoute><DashboardLayout><ScannerPage /></DashboardLayout></ProtectedRoute>} />
             <Route path="/dashboard/ip" element={<ProtectedRoute><DashboardLayout><IPManagementPage /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/dashboard/suspicious" element={<ProtectedRoute><DashboardLayout><SuspiciousActivityPage /></DashboardLayout></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

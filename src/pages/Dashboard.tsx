@@ -6,10 +6,10 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { Skeleton } from '@/components/ui/skeleton';
 
 const COLORS = [
-  'hsl(217, 89%, 61%)',
-  'hsl(4, 82%, 56%)',
-  'hsl(43, 96%, 50%)',
-  'hsl(142, 69%, 45%)',
+  'hsl(217, 89%, 61%)',  // GDG Blue
+  'hsl(4, 82%, 56%)',    // GDG Red
+  'hsl(43, 96%, 50%)',   // GDG Yellow
+  'hsl(142, 69%, 45%)',  // GDG Green
 ];
 
 const Dashboard = () => {
@@ -55,13 +55,19 @@ const Dashboard = () => {
     .sort((a, b) => b.value - a.value)
     .slice(0, 8);
 
-  // Year breakdown
-  const yearMap = new Map<string, number>();
+  // Gender breakdown
+  const genderMap = new Map<string, number>();
   regs.forEach((r) => {
-    const yr = r.year || 'Unknown';
-    yearMap.set(yr, (yearMap.get(yr) ?? 0) + 1);
+    const gender = r.gender || 'Unknown';
+    genderMap.set(gender, (genderMap.get(gender) ?? 0) + 1);
   });
-  const yearData = Array.from(yearMap.entries()).map(([name, value]) => ({ name, value }));
+  const genderData = Array.from(genderMap.entries()).map(([name, value]) => ({ name, value }));
+
+  // Detailed Residence stats
+  const femaleHostellers = regs.filter(r => r.gender === 'Female' && r.residence === 'Hosteller').length;
+  const femaleDayScholars = regs.filter(r => r.gender === 'Female' && r.residence === 'Day Scholar').length;
+  const maleHostellers = regs.filter(r => r.gender === 'Male' && r.residence === 'Hosteller').length;
+  const maleDayScholars = regs.filter(r => r.gender === 'Male' && r.residence === 'Day Scholar').length;
 
   return (
     <div className="space-y-6">
@@ -113,13 +119,13 @@ const Dashboard = () => {
 
         <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="font-heading text-base">Year Distribution</CardTitle>
+            <CardTitle className="font-heading text-base">Gender Distribution</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
-                  data={yearData}
+                  data={genderData}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -127,13 +133,54 @@ const Dashboard = () => {
                   dataKey="value"
                   label={({ name, value }) => `${name}: ${value}`}
                 >
-                  {yearData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  {genderData.map((entry, i) => (
+                    <Cell key={i} fill={entry.name === 'Male' ? COLORS[0] : entry.name === 'Female' ? COLORS[1] : COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Residence Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="font-heading text-base flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-gdg-red" />
+              Female Residence Breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+              <p className="text-xs text-muted-foreground mb-1">Hosteller</p>
+              <p className="text-2xl font-heading font-bold">{femaleHostellers}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+              <p className="text-xs text-muted-foreground mb-1">Day Scholar</p>
+              <p className="text-2xl font-heading font-bold">{femaleDayScholars}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="font-heading text-base flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-gdg-blue" />
+              Male Residence Breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+              <p className="text-xs text-muted-foreground mb-1">Hosteller</p>
+              <p className="text-2xl font-heading font-bold">{maleHostellers}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+              <p className="text-xs text-muted-foreground mb-1">Day Scholar</p>
+              <p className="text-2xl font-heading font-bold">{maleDayScholars}</p>
+            </div>
           </CardContent>
         </Card>
       </div>

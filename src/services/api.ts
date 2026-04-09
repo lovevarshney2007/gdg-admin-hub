@@ -53,6 +53,9 @@ export interface Registration {
   department: string;
   isPresentDay1: boolean;
   isPresentDay2: boolean;
+  gender?: string;
+  residence?: string;
+  ipAddress?: string;
   registeredAt: string;
   qrCode?: string;
   [key: string]: unknown;
@@ -86,6 +89,11 @@ export const blockIP = async (ip: string, reason: string) => {
 export const unblockIP = async (ip: string) => {
   const res = await api.post('/api/v1/admin/unblock-ip', { ipAddress: ip });
   return res.data;
+};
+
+export const fetchSuspiciousActivities = async () => {
+  const res = await api.get('/api/v1/admin/suspicious-activity');
+  return res.data.data;
 };
 
 export default api;

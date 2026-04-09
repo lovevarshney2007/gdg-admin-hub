@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchRegistrations, type Registration } from '@/services/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchRegistrations, blockIP, type Registration } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Download, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Search, Download, ChevronLeft, ChevronRight, CheckCircle2, ShieldBan, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const PAGE_SIZE = 15;
@@ -16,6 +17,18 @@ const CHECKS_STORAGE_KEY = 'gdg_admin_user_checks';
 const UsersPage = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const queryClient = useQueryClient();
+  
+  const blockMutation = useMutation({
+    mutationFn: ({ ip, reason }: { ip: string; reason: string }) => blockIP(ip, reason),
+    onSuccess: () => {
+      toast.success('IP blocked successfully');
+      queryClient.invalidateQueries({ queryKey: ['blockedIPs'] });
+    },
+    onError: () => {
+      toast.error('Failed to block IP');
+    },
+  });
   
   // Local state for checkboxes, initialized from localStorage
   const [checkedMap, setCheckedMap] = useState<Record<string, boolean>>(() => {
@@ -144,6 +157,20 @@ const UsersPage = () => {
                       </TableCell>
                       <TableCell className="text-center">
                         <AttendanceBadge present={r.isPresentDay2} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {r.ipAddress && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            disabled={blockMutation.isPending}
+                            onClick={() => blockMutation.mutate({ ip: r.ipAddress! as string, reason: `Blocked manually for ${r.name}` })}
+                            title="Block IP"
+                          >
+                            <ShieldBan className="w-4 h-4" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
