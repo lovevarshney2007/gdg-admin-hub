@@ -20,14 +20,21 @@ interface ScanResult {
 const ScannerPage = () => {
   const [scanning, setScanning] = useState(false);
   const [day, setDay] = useState<1 | 2>(() => {
-    const today = new Date();
-    // Simple heuristic — can be customized
+    const saved = localStorage.getItem('gdg_scanner_day');
+    if (saved === '1' || saved === '2') return parseInt(saved) as 1 | 2;
     return 1;
   });
+  const dayRef = useRef<1 | 2>(day);
   const [manualInput, setManualInput] = useState('');
   const [history, setHistory] = useState<ScanResult[]>([]);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const lastScannedTimeRef = useRef<Record<string, number>>({});
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    dayRef.current = day;
+    localStorage.setItem('gdg_scanner_day', day.toString());
+  }, [day]);
 
   const mutation = useMutation({
     mutationFn: ({ studentNumber, d }: { studentNumber: string; d: 1 | 2 }) =>
@@ -60,11 +67,17 @@ const ScannerPage = () => {
     (decodedText: string) => {
       const studentNumber = decodedText.trim();
       if (!studentNumber) return;
-      // Prevent duplicate rapid scans
-      if (history.length > 0 && history[0].studentNumber === studentNumber) return;
-      mutation.mutate({ studentNumber, d: day });
+
+      const now = Date.now();
+      const lastTime = lastScannedTimeRef.current[studentNumber] || 0;
+      
+      // Prevent duplicate scans within 3 seconds for the same student
+      if (now - lastTime < 3000) return;
+      
+      lastScannedTimeRef.current[studentNumber] = now;
+      mutation.mutate({ studentNumber, d: dayRef.current });
     },
-    [day, history, mutation]
+    [mutation]
   );
 
   const startScanner = async () => {
