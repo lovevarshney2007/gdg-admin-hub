@@ -1,12 +1,21 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { markAttendance } from '@/services/api';
+import { fetchRegistrations, markAttendance, type Registration } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Camera, CameraOff, CheckCircle2, XCircle, Loader2, Hash } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,6 +24,11 @@ interface ScanResult {
   success: boolean;
   message: string;
   timestamp: Date;
+}
+
+interface PendingAttendance {
+  studentNumber: string;
+  day: 1 | 2 | 3;
 }
 
 const ScannerPage = () => {
@@ -27,6 +41,7 @@ const ScannerPage = () => {
   const dayRef = useRef<1 | 2 | 3>(day);
   const [manualInput, setManualInput] = useState('');
   const [history, setHistory] = useState<ScanResult[]>([]);
+  const [pendingAttendance, setPendingAttendance] = useState<PendingAttendance | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScannedTimeRef = useRef<Record<string, number>>({});
   const queryClient = useQueryClient();
@@ -63,8 +78,51 @@ const ScannerPage = () => {
     },
   });
 
+  const submitAttendance = useCallback(
+    (studentNumber: string, selectedDay: 1 | 2 | 3) => {
+      mutation.mutate({ studentNumber, d: selectedDay });
+    },
+    [mutation]
+  );
+
+  const getRegistrationForStudent = useCallback(
+    async (studentNumber: string) => {
+      const registrations = await queryClient.ensureQueryData<Registration[]>({
+        queryKey: ['registrations'],
+        queryFn: fetchRegistrations,
+      });
+
+      return registrations.find((registration) => registration.studentNumber?.trim() === studentNumber);
+    },
+    [queryClient]
+  );
+
+  const handleAttendanceAttempt = useCallback(
+    async (studentNumber: string, selectedDay: 1 | 2 | 3) => {
+      if (selectedDay !== 3) {
+        submitAttendance(studentNumber, selectedDay);
+        return;
+      }
+
+      try {
+        const registration = await getRegistrationForStudent(studentNumber);
+
+        if (registration && !registration.isPresentDay1 && !registration.isPresentDay2) {
+          setPendingAttendance({ studentNumber, day: selectedDay });
+          return;
+        }
+      } catch {
+        toast.error('Unable to verify previous attendance. Please try again.');
+        return;
+      }
+
+      submitAttendance(studentNumber, selectedDay);
+    },
+    [getRegistrationForStudent, submitAttendance]
+  );
+
   const handleScan = useCallback(
-    (decodedText: string) => {
+    async (decodedText: string) => {
       const studentNumber = decodedText.trim();
       if (!studentNumber) return;
 
@@ -75,9 +133,9 @@ const ScannerPage = () => {
       if (now - lastTime < 3000) return;
       
       lastScannedTimeRef.current[studentNumber] = now;
-      mutation.mutate({ studentNumber, d: dayRef.current });
+      await handleAttendanceAttempt(studentNumber, dayRef.current);
     },
-    [mutation]
+    [handleAttendanceAttempt]
   );
 
   const startScanner = async () => {
@@ -114,7 +172,7 @@ const ScannerPage = () => {
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!manualInput.trim()) return;
-    mutation.mutate({ studentNumber: manualInput.trim(), d: day });
+    handleAttendanceAttempt(manualInput.trim(), day);
     setManualInput('');
   };
 
@@ -234,6 +292,29 @@ const ScannerPage = () => {
           </CardContent>
         </Card>
       )}
+
+      <AlertDialog open={!!pendingAttendance} onOpenChange={(open) => !open && setPendingAttendance(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Previous absence detected</AlertDialogTitle>
+            <AlertDialogDescription>
+              This person was absent on both Day 1 and Day 2. Do you still want to mark them present for Day 3?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!pendingAttendance) return;
+                submitAttendance(pendingAttendance.studentNumber, pendingAttendance.day);
+                setPendingAttendance(null);
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
