@@ -66,13 +66,14 @@ const UsersPage = () => {
   };
 
   const exportCSV = () => {
-    const headers = ['S.No', 'Verified', 'Name', 'Email', 'Phone', 'Student Number', 'College', 'Year', 'Department', 'Day 1', 'Day 2'];
+    const headers = ['S.No', 'Verified', 'Name', 'Email', 'Phone', 'Student Number', 'College', 'Year', 'Department', 'Day 1', 'Day 2', 'Day 3'];
     const rows = filtered.map((r, index) => [
       index + 1,
       checkedMap[r.studentNumber] ? 'YES' : 'NO',
       r.name, r.email, r.phone, r.studentNumber, r.college, r.year, r.department,
       r.isPresentDay1 ? 'Present' : 'Absent',
       r.isPresentDay2 ? 'Present' : 'Absent',
+      r.isPresentDay3 ? 'Present' : 'Absent',
     ]);
     const csv = [headers, ...rows].map((row) => row.map((v) => `"${v ?? ''}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -125,12 +126,14 @@ const UsersPage = () => {
                   <TableHead>Year</TableHead>
                   <TableHead className="text-center">Day 1</TableHead>
                   <TableHead className="text-center">Day 2</TableHead>
+                  <TableHead className="text-center">Day 3</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginated.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
                       No registrations found
                     </TableCell>
                   </TableRow>
@@ -157,6 +160,9 @@ const UsersPage = () => {
                       </TableCell>
                       <TableCell className="text-center">
                         <AttendanceBadge present={r.isPresentDay2} />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <AttendanceBadge present={r.isPresentDay3} />
                       </TableCell>
                       <TableCell className="text-right">
                         {r.ipAddress && (

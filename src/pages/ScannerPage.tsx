@@ -19,12 +19,12 @@ interface ScanResult {
 
 const ScannerPage = () => {
   const [scanning, setScanning] = useState(false);
-  const [day, setDay] = useState<1 | 2>(() => {
+  const [day, setDay] = useState<1 | 2 | 3>(() => {
     const saved = localStorage.getItem('gdg_scanner_day');
-    if (saved === '1' || saved === '2') return parseInt(saved) as 1 | 2;
+    if (saved === '1' || saved === '2' || saved === '3') return parseInt(saved) as 1 | 2 | 3;
     return 1;
   });
-  const dayRef = useRef<1 | 2>(day);
+  const dayRef = useRef<1 | 2 | 3>(day);
   const [manualInput, setManualInput] = useState('');
   const [history, setHistory] = useState<ScanResult[]>([]);
   const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -37,7 +37,7 @@ const ScannerPage = () => {
   }, [day]);
 
   const mutation = useMutation({
-    mutationFn: ({ studentNumber, d }: { studentNumber: string; d: 1 | 2 }) =>
+    mutationFn: ({ studentNumber, d }: { studentNumber: string; d: 1 | 2 | 3 }) =>
       markAttendance(studentNumber, d),
     onSuccess: (_, vars) => {
       const result: ScanResult = {
@@ -137,6 +137,13 @@ const ScannerPage = () => {
             onClick={() => setDay(2)}
           >
             Day 2
+          </Button>
+          <Button
+            variant={day === 3 ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setDay(3)}
+          >
+            Day 3
           </Button>
         </div>
       </div>

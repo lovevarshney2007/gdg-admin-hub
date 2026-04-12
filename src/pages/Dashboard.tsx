@@ -35,12 +35,14 @@ const Dashboard = () => {
   const totalRegistrations = regs.length;
   const day1Present = regs.filter((r) => r.isPresentDay1).length;
   const day2Present = regs.filter((r) => r.isPresentDay2).length;
-  const attendanceRate = totalRegistrations > 0 ? Math.round(((day1Present + day2Present) / (totalRegistrations * 2)) * 100) : 0;
+  const day3Present = regs.filter((r) => r.isPresentDay3).length;
+  const attendanceRate = totalRegistrations > 0 ? Math.round(((day1Present + day2Present + day3Present) / (totalRegistrations * 3)) * 100) : 0;
 
   const stats = [
     { label: 'Total Registrations', value: totalRegistrations, icon: Users, color: 'text-gdg-blue' },
     { label: 'Day 1 Present', value: day1Present, icon: UserCheck, color: 'text-gdg-green' },
     { label: 'Day 2 Present', value: day2Present, icon: CalendarDays, color: 'text-gdg-yellow' },
+    { label: 'Day 3 Present', value: day3Present, icon: CalendarDays, color: 'text-gdg-blue' },
     { label: 'Attendance Rate', value: `${attendanceRate}%`, icon: TrendingUp, color: 'text-gdg-red' },
   ];
 
@@ -72,7 +74,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Stats cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="glass-card">
             <CardContent className="pt-6">

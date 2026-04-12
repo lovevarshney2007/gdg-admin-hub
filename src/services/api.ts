@@ -53,6 +53,7 @@ export interface Registration {
   department: string;
   isPresentDay1: boolean;
   isPresentDay2: boolean;
+  isPresentDay3: boolean;
   gender?: string;
   residence?: string;
   ipAddress?: string;
@@ -66,7 +67,7 @@ export const fetchRegistrations = async (): Promise<Registration[]> => {
   return res.data.data;
 };
 
-export const markAttendance = async (studentNumber: string, day: 1 | 2) => {
+export const markAttendance = async (studentNumber: string, day: 1 | 2 | 3) => {
   const res = await api.post('/api/v1/admin/mark-attendance', { qrData: studentNumber, day });
   return res.data;
 };
