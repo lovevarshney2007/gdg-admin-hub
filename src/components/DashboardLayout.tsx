@@ -49,7 +49,7 @@ function AppSidebar() {
                 <div className="w-2 h-2 rounded-full bg-gdg-yellow" />
                 <div className="w-2 h-2 rounded-full bg-gdg-green" />
               </div>
-              <h2 className="font-heading font-bold text-sm text-sidebar-foreground">GDG AKGEC</h2>
+              <h2 className="font-heading font-bold text-sm text-sidebar-foreground">Proximity 6.0 🚀</h2>
             </div>
           )}
         </div>

@@ -56,6 +56,12 @@ export interface Registration {
   isPresentDay3: boolean;
   gender?: string;
   residence?: string;
+  branch?: string;
+  domain?: string;
+  githubId?: string;
+  hackerrankId?: string;
+  unstopId?: string;
+  isVerified?: boolean;
   ipAddress?: string;
   registeredAt: string;
   qrCode?: string;

@@ -122,8 +122,9 @@ const UsersPage = () => {
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Student #</TableHead>
-                  <TableHead>Dept</TableHead>
-                  <TableHead>Year</TableHead>
+                  <TableHead>Branch</TableHead>
+                  <TableHead>Domain</TableHead>
+                  <TableHead>Residence</TableHead>
                   <TableHead className="text-center">Day 1</TableHead>
                   <TableHead className="text-center">Day 2</TableHead>
                   <TableHead className="text-center">Day 3</TableHead>
@@ -133,7 +134,7 @@ const UsersPage = () => {
               <TableBody>
                 {paginated.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
                       No registrations found
                     </TableCell>
                   </TableRow>
@@ -150,11 +151,21 @@ const UsersPage = () => {
                           className="data-[state=checked]:bg-success data-[state=checked]:border-success transition-colors"
                         />
                       </TableCell>
-                      <TableCell className="font-medium">{r.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {r.name}
+                        {r.isVerified && (
+                          <span className="ml-1.5 inline-block text-[10px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded font-mono">
+                            Verified
+                          </span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{r.email}</TableCell>
                       <TableCell className="font-mono text-sm">{r.studentNumber}</TableCell>
-                      <TableCell>{r.department}</TableCell>
-                      <TableCell>{r.year}</TableCell>
+                      <TableCell>{r.branch || r.department || '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">{r.domain || '-'}</Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{r.residence || '-'}</TableCell>
                       <TableCell className="text-center">
                         <AttendanceBadge present={r.isPresentDay1} />
                       </TableCell>

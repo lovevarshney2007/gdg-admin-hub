@@ -42,8 +42,8 @@ const Login = () => {
             <div className="w-3 h-3 rounded-full bg-gdg-yellow" />
             <div className="w-3 h-3 rounded-full bg-gdg-green" />
           </div>
-          <h1 className="text-3xl font-bold font-heading">GDG AKGEC</h1>
-          <p className="text-muted-foreground">Event Registration Admin</p>
+          <h1 className="text-3xl font-bold font-heading">Proximity 6.0 🚀</h1>
+          <p className="text-muted-foreground">GDG AKGEC Event Admin Hub</p>
         </div>
 
         <Card className="glass-card">
