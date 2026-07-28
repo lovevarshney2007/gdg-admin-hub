@@ -43,7 +43,8 @@ export const validateApiKey = async (key: string) => {
 };
 
 export interface Registration {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
   email: string;
   phone: string;
