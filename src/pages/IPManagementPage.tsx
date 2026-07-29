@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchBlockedIPs, blockIP, unblockIP } from '@/services/api';
+import { fetchBlockedIPs, blockIP, unblockIP, clearAllBlockedIPs } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShieldBan, Plus, Trash2, Loader2 } from 'lucide-react';
+import { ShieldBan, Plus, Trash2, Loader2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const IPManagementPage = () => {
@@ -42,6 +42,23 @@ const IPManagementPage = () => {
       toast.error('Failed to unblock IP');
     },
   });
+
+  const clearAllMutation = useMutation({
+    mutationFn: clearAllBlockedIPs,
+    onSuccess: (data: any) => {
+      toast.success(data?.message || 'All blocked IPs cleared successfully');
+      queryClient.invalidateQueries({ queryKey: ['blockedIPs'] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || 'Failed to clear blocked IPs');
+    },
+  });
+
+  const handleClearAll = () => {
+    if (window.confirm('⚠️ Are you sure you want to clear ALL blocked IPs and suspicious activity records? This cannot be undone.')) {
+      clearAllMutation.mutate();
+    }
+  };
 
   const handleBlock = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,11 +103,27 @@ const IPManagementPage = () => {
       {/* Blocked IPs list */}
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="font-heading text-base">
+          <CardTitle className="font-heading text-base flex items-center gap-2">
             Blocked IPs
             {ips.length > 0 && (
-              <Badge variant="secondary" className="ml-2">{ips.length}</Badge>
+              <Badge variant="secondary" className="ml-0">{ips.length}</Badge>
             )}
+            <div className="ml-auto">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleClearAll}
+                disabled={clearAllMutation.isPending || ips.length === 0}
+                className="gap-2"
+              >
+                {clearAllMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <AlertTriangle className="w-4 h-4" />
+                )}
+                Clear All
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

@@ -99,6 +99,11 @@ export const unblockIP = async (ip: string) => {
   return res.data;
 };
 
+export const clearAllBlockedIPs = async () => {
+  const res = await api.delete('/api/v1/admin/clear-all-blocked-ips');
+  return res.data;
+};
+
 export const fetchSuspiciousActivities = async () => {
   const res = await api.get('/api/v1/admin/suspicious-activity');
   return res.data.data;
