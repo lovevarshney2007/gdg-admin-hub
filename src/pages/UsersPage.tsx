@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Search, Download, ChevronLeft, ChevronRight, CheckCircle2, ShieldBan, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const PAGE_SIZE = 15;
 const CHECKS_STORAGE_KEY = 'gdg_admin_user_checks';
@@ -17,6 +18,8 @@ const CHECKS_STORAGE_KEY = 'gdg_admin_user_checks';
 const UsersPage = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [filterGender, setFilterGender] = useState<string>('all');
+  const [filterResidence, setFilterResidence] = useState<string>('all');
   const queryClient = useQueryClient();
   
   const blockMutation = useMutation({
@@ -47,13 +50,18 @@ const UsersPage = () => {
 
   const filtered = (registrations ?? []).filter((r) => {
     const q = search.toLowerCase();
-    return (
+    const matchesSearch = (
       r.name?.toLowerCase().includes(q) ||
       r.email?.toLowerCase().includes(q) ||
       r.studentNumber?.toLowerCase().includes(q) ||
       r.phone?.includes(q) ||
       r.department?.toLowerCase().includes(q)
     );
+
+    const matchesGender = filterGender === 'all' || r.gender?.toLowerCase() === filterGender.toLowerCase();
+    const matchesResidence = filterResidence === 'all' || r.residence?.toLowerCase() === filterResidence.toLowerCase();
+
+    return matchesSearch && matchesGender && matchesResidence;
   });
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -66,16 +74,25 @@ const UsersPage = () => {
   };
 
   const exportCSV = () => {
-    const headers = ['S.No', 'Verified', 'Name', 'Email', 'Phone', 'Student Number', 'College', 'Year', 'Department', 'Day 1', 'Day 2', 'Day 3'];
+    const headers = [
+      'S.No', 'Verified (Export)', 'Name', 'Email', 'Phone', 'Student Number', 
+      'College', 'Year', 'Department', 'Branch', 'Domain', 'Gender', 'Residence', 
+      'GitHub ID', 'HackerRank ID', 'Unstop ID', 'Verified (System)', 'IP Address', 
+      'Registered At', 'Day 1', 'Day 2', 'Day 3'
+    ];
     const rows = filtered.map((r, index) => [
       index + 1,
       checkedMap[r.studentNumber] ? 'YES' : 'NO',
       r.name, r.email, r.phone, r.studentNumber, r.college, r.year, r.department,
+      r.branch || '', r.domain || '', r.gender || '', r.residence || '', 
+      r.githubId || '', r.hackerrankId || '', r.unstopId || '',
+      r.isVerified ? 'YES' : 'NO', r.ipAddress || '', 
+      r.registeredAt ? new Date(r.registeredAt).toLocaleString() : '',
       r.isPresentDay1 ? 'Present' : 'Absent',
       r.isPresentDay2 ? 'Present' : 'Absent',
       r.isPresentDay3 ? 'Present' : 'Absent',
     ]);
-    const csv = [headers, ...rows].map((row) => row.map((v) => `"${v ?? ''}"`).join(',')).join('\n');
+    const csv = [headers, ...rows].map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -91,17 +108,42 @@ const UsersPage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, email, student #..."
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="pl-9"
-          />
+      <div className="flex flex-col xl:flex-row gap-3 items-start xl:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, email, student #..."
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+              className="pl-9"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Select value={filterGender} onValueChange={(val) => { setFilterGender(val); setPage(0); }}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Genders</SelectItem>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filterResidence} onValueChange={(val) => { setFilterResidence(val); setPage(0); }}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Residence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Residences</SelectItem>
+                <SelectItem value="hosteller">Hosteller</SelectItem>
+                <SelectItem value="day scholar">Day Scholar</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-2 w-full xl:w-auto mt-2 xl:mt-0">
           <Button variant="outline" onClick={exportCSV} className="gap-2 flex-1 sm:flex-none">
             <Download className="w-4 h-4" />
             Export CSV
