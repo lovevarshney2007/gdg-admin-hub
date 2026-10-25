@@ -37,27 +37,27 @@ const Dashboard = () => {
   const day1Present = regs.filter((r) => r.isPresentDay1).length;
   const day2Present = regs.filter((r) => r.isPresentDay2).length;
   const day3Present = regs.filter((r) => r.isPresentDay3).length;
-  const attendanceRate = totalRegistrations > 0 ? Math.round(((day1Present + day2Present + day3Present) / (totalRegistrations * 3)) * 100) : 0;
+  const attendanceRate = totalRegistrations > 0 ? Math.round((day1Present / totalRegistrations) * 100) : 0;
 
   const stats = [
     { label: 'Total Registrations', value: totalRegistrations, icon: Users, color: 'text-gdg-blue' },
     { label: 'Verified (Email)', value: verifiedCount, icon: UserCheck, color: 'text-emerald-500' },
-    { label: 'Day 1 Present', value: day1Present, icon: CalendarDays, color: 'text-gdg-green' },
-    { label: 'Day 2 Present', value: day2Present, icon: CalendarDays, color: 'text-gdg-yellow' },
-    { label: 'Day 3 Present', value: day3Present, icon: CalendarDays, color: 'text-gdg-blue' },
+    { label: 'Event Check-In', value: day1Present, icon: CalendarDays, color: 'text-gdg-green' },
+    { label: 'Day 2 (Optional)', value: day2Present, icon: CalendarDays, color: 'text-gdg-yellow' },
+    { label: 'Day 3 (Optional)', value: day3Present, icon: CalendarDays, color: 'text-gdg-blue' },
     { label: 'Attendance Rate', value: `${attendanceRate}%`, icon: TrendingUp, color: 'text-gdg-red' },
   ];
 
-  // Department breakdown
+  // Branch breakdown
   const deptMap = new Map<string, number>();
   regs.forEach((r) => {
-    const dept = r.department || 'Unknown';
+    const dept = r.branch || r.department || 'Unknown';
     deptMap.set(dept, (deptMap.get(dept) ?? 0) + 1);
   });
   const deptData = Array.from(deptMap.entries())
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
-    .slice(0, 8);
+    .slice(0, 12);
 
   // Gender breakdown
   const genderMap = new Map<string, number>();
@@ -96,7 +96,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="font-heading text-base">Registrations by Department</CardTitle>
+            <CardTitle className="font-heading text-base">Registrations by Branch</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>

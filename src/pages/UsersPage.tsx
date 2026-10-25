@@ -55,6 +55,8 @@ const UsersPage = () => {
       r.email?.toLowerCase().includes(q) ||
       r.studentNumber?.toLowerCase().includes(q) ||
       r.phone?.includes(q) ||
+      r.branch?.toLowerCase().includes(q) ||
+      r.domain?.toLowerCase().includes(q) ||
       r.department?.toLowerCase().includes(q)
     );
 

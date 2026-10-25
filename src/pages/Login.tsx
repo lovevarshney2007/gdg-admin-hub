@@ -42,7 +42,7 @@ const Login = () => {
             <div className="w-3 h-3 rounded-full bg-gdg-yellow" />
             <div className="w-3 h-3 rounded-full bg-gdg-green" />
           </div>
-          <h1 className="text-3xl font-bold font-heading">Proximity 6.0 🚀</h1>
+          <h1 className="text-3xl font-bold font-heading">Byte Talks 2026 🚀</h1>
           <p className="text-muted-foreground">GDG AKGEC Event Admin Hub</p>
         </div>
 
