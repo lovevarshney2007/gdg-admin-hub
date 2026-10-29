@@ -18,3 +18,4 @@ VITE_API_BASE_URL=https://proximety-7nt5.vercel.app
 npm install
 npm run dev
 ```
+ 
