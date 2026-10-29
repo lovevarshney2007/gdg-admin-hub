@@ -18,4 +18,10 @@ VITE_API_BASE_URL=https://proximety-7nt5.vercel.app
 npm install
 npm run dev
 ```
- 
+
+## Deployment
+Configured for automated continuous deployment on Vercel.
+
+---
+
+*Maintained by GDG On Campus AKGEC.*
