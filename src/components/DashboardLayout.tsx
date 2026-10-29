@@ -111,7 +111,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
             <div className="h-4 w-px bg-border" />
             <h1 className="font-heading font-semibold text-lg">{currentTitle}</h1>
           </header>
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 p-3 sm:p-5 md:p-6 w-full max-w-full overflow-x-hidden">{children}</main>
         </div>
       </div>
     </SidebarProvider>
